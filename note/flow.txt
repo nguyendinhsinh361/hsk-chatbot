@@ -1,0 +1,27 @@
+   # Example of making a request to the chatbot API
+   import requests
+   
+   # First request (no session_id provided, will create a new one)
+   response = requests.post(
+       "http://localhost:8000/api/chat",
+       json={
+           "user_input": "Xin chào, tôi muốn học từ vựng HSK",
+           "use_graph": True,
+           "model_provider": "gemini"  # Using enum value
+       }
+   )
+   
+   # Extract the session_id from the response
+   session_data = response.json()
+   session_id = session_data["session_id"]
+   
+   # Use the session_id in subsequent requests to maintain conversation context
+   response2 = requests.post(
+       "http://localhost:8000/api/chat",
+       json={
+           "user_input": "Một số từ dành cho người mới bắt đầu là gì?",
+           "session_id": session_id,  # Include the session_id here
+           "use_graph": True,
+           "model_provider": "gemini"
+       }
+   )

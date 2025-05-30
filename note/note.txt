@@ -1,0 +1,13 @@
+conda create -n hsk-chatbot python=3.11 -y
+conda activate hsk-chatbot
+conda deactivate
+conda env remove --name hsk-chatbot
+/opt/anaconda3/envs/hsk-chatbot/bin/python
+
+python -m app.main
+
+python run.py
+
+docker-compose down
+docker-compose build --no-cache
+docker-compose up
