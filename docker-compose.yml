@@ -7,7 +7,7 @@ services:
       - .:/app
     environment:
       - PYTHONPATH=/app
-      - MONGODB_URI=mongodb://mongodb:27017
+      - MONGODB_URI=mongodb://host.docker.internal:27017
       - MONGODB_DB_NAME=hsk_chatbot
       - OPENAI_API_KEY=${OPENAI_API_KEY}
       - GOOGLE_API_KEY=${GOOGLE_API_KEY}
@@ -15,16 +15,6 @@ services:
       - LANGSMITH_PROJECT=${LANGSMITH_PROJECT:-hsk_chatbot}
       - LANGSMITH_TRACING=${LANGSMITH_TRACING:-true}
       - LANGSMITH_ENDPOINT=${LANGSMITH_ENDPOINT:-https://api.smith.langchain.com}
-    depends_on:
-      - mongodb
-    restart: unless-stopped
-
-  mongodb:
-    image: mongo:latest
-    ports:
-      - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
     restart: unless-stopped
 
 volumes:
