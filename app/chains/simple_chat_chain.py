@@ -7,7 +7,7 @@ from app.utils.langsmith import get_langchain_tracer
 from app.config.config import LANGSMITH_TRACING
 from app.enum.model import ModelProvider, ModelGeminiName, ModelOpenAiName
 
-def create_simple_chat_chain(session_id, model_provider: ModelProvider = ModelProvider.GEMINI, model_name: ModelGeminiName = ModelGeminiName.GEMINI_2_0_FLASH, temperature=0.7):
+def create_simple_chat_chain(session_id, model_provider: ModelProvider = ModelProvider.GEMINI, model_name: ModelGeminiName = ModelGeminiName.GEMINI_2_0_FLASH.value, temperature=0.7, max_tokens=200):
     """
     Create a simple conversational chain with memory.
     
@@ -16,13 +16,19 @@ def create_simple_chat_chain(session_id, model_provider: ModelProvider = ModelPr
         model_provider (str): The LLM provider to use ('openai' or 'gemini')
         model_name (str, optional): The specific model name to use
         temperature (float): Controls randomness in responses
+        max_tokens (int): Maximum number of tokens in the response (default: 150)
         
     Returns:
         Runnable: A runnable chain for chatting
     """
     # Configure model parameters
-    model_kwargs = {"temperature": temperature}
+    model_kwargs = {
+        "temperature": temperature,
+        "max_tokens": max_tokens
+    }
     
+    if model_provider == ModelProvider.OPENAI:
+        model_name = ModelOpenAiName.OPENAI_GPT_4_1_NANO
     # Convert enum to string value if it's an enum
     model_name_value = model_name.value if hasattr(model_name, 'value') else model_name
     
@@ -39,7 +45,9 @@ def create_simple_chat_chain(session_id, model_provider: ModelProvider = ModelPr
     message_history = get_conversation_memory(session_id)
     
     # Create the prompt template - handle differently based on model provider
-    system_instruction = "Bạn là một trợ lý trò chuyện thân thiện và hữu ích."
+    system_instruction = """You are a friendly and helpful HSK chatbot assistant. Your name is "mIA"
+    Please respond in the same language as the user's input.
+    You specialize in teaching Chinese (HSK) and can help with vocabulary, grammar, and language learning."""
     
     if model_provider == ModelProvider.GEMINI:
         # For Gemini, we include the system instruction in the first human message
@@ -73,7 +81,8 @@ def create_simple_chat_chain(session_id, model_provider: ModelProvider = ModelPr
         message_history.add_user_message(input_dict["input"])
         message_history.add_ai_message(output)
         
-        return output
+        # Return a dictionary with output key instead of just the string
+        return {"output": output}
     
     # Return the chain function
     return chain_with_memory 

@@ -5,13 +5,14 @@ from app.config.config import OPENAI_API_KEY, GOOGLE_API_KEY, LANGSMITH_TRACING
 from app.utils.langsmith import get_langsmith_tracer
 from app.enum.model import ModelProvider, ModelGeminiName, ModelOpenAiName
 
-def get_openai_model(model_name: ModelOpenAiName = ModelOpenAiName.OPENAI_GPT_4O_MINI, temperature=0.7, run_name=None) -> BaseChatModel:
+def get_openai_model(model_name: ModelOpenAiName = ModelOpenAiName.OPENAI_GPT_4_1_NANO, temperature=0.7, max_tokens=None, run_name=None) -> BaseChatModel:
     """
     Initialize and return an OpenAI chat model.
     
     Args:
         model_name (str): The name of the OpenAI model to use
         temperature (float): Controls randomness in responses
+        max_tokens (int, optional): Maximum number of tokens to generate
         run_name (str, optional): Name for tracing runs
         
     Returns:
@@ -29,20 +30,27 @@ def get_openai_model(model_name: ModelOpenAiName = ModelOpenAiName.OPENAI_GPT_4O
         if tracer:
             callbacks.append(tracer)
     
-    return ChatOpenAI(
-        model=model_name_value,
-        temperature=temperature,
-        api_key=OPENAI_API_KEY,
-        callbacks=callbacks if callbacks else None
-    )
+    model_kwargs = {
+        "model": model_name_value,
+        "temperature": temperature,
+        "api_key": OPENAI_API_KEY,
+        "callbacks": callbacks if callbacks else None
+    }
+    
+    # Add max_tokens if provided
+    if max_tokens is not None:
+        model_kwargs["max_tokens"] = max_tokens
+    
+    return ChatOpenAI(**model_kwargs)
 
-def get_gemini_model(model_name: ModelGeminiName = ModelGeminiName.GEMINI_2_0_FLASH, temperature=0.7, run_name=None) -> BaseChatModel:
+def get_gemini_model(model_name: ModelGeminiName = ModelGeminiName.GEMINI_2_0_FLASH, temperature=0.7, max_tokens=None, run_name=None) -> BaseChatModel:
     """
     Initialize and return a Google Gemini chat model.
     
     Args:
         model_name (str): The name of the Gemini model to use
         temperature (float): Controls randomness in responses
+        max_tokens (int, optional): Maximum number of tokens to generate
         run_name (str, optional): Name for tracing runs
         
     Returns:
@@ -60,12 +68,18 @@ def get_gemini_model(model_name: ModelGeminiName = ModelGeminiName.GEMINI_2_0_FL
         if tracer:
             callbacks.append(tracer)
     
-    return ChatGoogleGenerativeAI(
-        model=model_name_value,
-        temperature=temperature,
-        google_api_key=GOOGLE_API_KEY,
-        callbacks=callbacks if callbacks else None
-    )
+    model_kwargs = {
+        "model": model_name_value,
+        "temperature": temperature,
+        "google_api_key": GOOGLE_API_KEY,
+        "callbacks": callbacks if callbacks else None
+    }
+    
+    # Add max_tokens if provided
+    if max_tokens is not None:
+        model_kwargs["max_output_tokens"] = max_tokens  # Gemini uses max_output_tokens instead of max_tokens
+    
+    return ChatGoogleGenerativeAI(**model_kwargs)
 
 def get_model(provider: ModelProvider = ModelProvider.GEMINI, run_name=None, **kwargs) -> BaseChatModel:
     """

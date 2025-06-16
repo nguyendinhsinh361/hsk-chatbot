@@ -37,7 +37,8 @@ def get_or_create_session(session_id: Optional[str] = None, model_provider: Mode
 def chat_with_simple_chain(
     user_input: str, 
     session_id: Optional[str] = None, 
-    model_provider: ModelProvider = ModelProvider.GEMINI
+    model_provider: ModelProvider = ModelProvider.GEMINI,
+    max_tokens: int = 200
 ) -> Tuple[Dict[str, Any], str]:
     """
     Chat with the user using the simple chain approach.
@@ -46,6 +47,7 @@ def chat_with_simple_chain(
         user_input (str): The user's input message
         session_id (str, optional): An existing session ID
         model_provider (str): The LLM provider to use
+        max_tokens (int): Maximum number of tokens in the response (default: 200)
         
     Returns:
         Tuple[Dict[str, Any], str]: (response, session_id)
@@ -57,7 +59,7 @@ def chat_with_simple_chain(
     save_message_to_memory(session_id, "user", user_input)
     
     # Create the chain
-    chain = create_simple_chat_chain(session_id, model_provider=model_provider)
+    chain = create_simple_chat_chain(session_id, model_provider=model_provider, max_tokens=max_tokens)
     
     # Call the chain
     result = chain({"input": user_input})
@@ -70,7 +72,9 @@ def chat_with_simple_chain(
 def chat_with_graph(
     user_input: str, 
     session_id: Optional[str] = None, 
-    model_provider: ModelProvider = ModelProvider.GEMINI
+    model_provider: ModelProvider = ModelProvider.GEMINI,
+    max_tokens: int = 200,
+    similarity_threshold: float = 0.6
 ) -> Tuple[Dict[str, Any], str]:
     """
     Chat with the user using the graph-based approach.
@@ -79,6 +83,8 @@ def chat_with_graph(
         user_input (str): The user's input message
         session_id (str, optional): An existing session ID
         model_provider (str): The LLM provider to use
+        max_tokens (int): Maximum number of tokens in the response (default: 200)
+        similarity_threshold (float): Minimum similarity score (0.0 to 1.0) for vector search
         
     Returns:
         Tuple[Dict[str, Any], str]: (response, session_id)
@@ -90,10 +96,10 @@ def chat_with_graph(
     save_message_to_memory(session_id, "user", user_input)
     
     # Create the graph
-    graph = create_chat_graph(session_id, model_provider=model_provider)
+    graph = create_chat_graph(session_id, model_provider=model_provider, max_tokens=max_tokens)
     
     # Process user input
-    result = process_user_input(graph, user_input, session_id)
+    result = process_user_input(graph, user_input, session_id, similarity_threshold=similarity_threshold)
     
     # Save assistant response
     if "output" in result:

@@ -9,7 +9,7 @@ from app.core.config import settings
 from app.core.langsmith import get_langsmith_tracer
 from app.enum.model import ModelProvider, ModelGeminiName, ModelOpenAiName
 
-def get_openai_model(model_name: ModelOpenAiName = ModelOpenAiName.OPENAI_GPT_4O_MINI, temperature=0.7, run_name=None) -> BaseChatModel:
+def get_openai_model(model_name: ModelOpenAiName = ModelOpenAiName.OPENAI_GPT_4_1_NANO, temperature=0.7, run_name=None) -> BaseChatModel:
     """
     Initialize and return an OpenAI chat model.
     
@@ -26,18 +26,18 @@ def get_openai_model(model_name: ModelOpenAiName = ModelOpenAiName.OPENAI_GPT_4O
     
     callbacks = []
     if settings.LANGSMITH_TRACING:
-        tracer = get_langsmith_tracer(run_name=run_name or f"openai-{model_name}")
+        tracer = get_langsmith_tracer(run_name=run_name or f"openai-{model_name.value}")
         if tracer:
             callbacks.append(tracer)
     
     return ChatOpenAI(
-        model=model_name,
+        model=model_name.value,
         temperature=temperature,
         api_key=settings.OPENAI_API_KEY,
         callbacks=callbacks if callbacks else None
     )
 
-def get_gemini_model(model_name="gemini-2.0-flash", temperature=0.7, run_name=None) -> BaseChatModel:
+def get_gemini_model(model_name: ModelGeminiName = ModelGeminiName.GEMINI_2_0_FLASH, temperature=0.7, run_name=None) -> BaseChatModel:
     """
     Initialize and return a Google Gemini chat model.
     
@@ -54,12 +54,12 @@ def get_gemini_model(model_name="gemini-2.0-flash", temperature=0.7, run_name=No
     
     callbacks = []
     if settings.LANGSMITH_TRACING:
-        tracer = get_langsmith_tracer(run_name=run_name or f"gemini-{model_name}")
+        tracer = get_langsmith_tracer(run_name=run_name or f"gemini-{model_name.value}")
         if tracer:
             callbacks.append(tracer)
     
     return ChatGoogleGenerativeAI(
-        model=model_name,
+        model=model_name.value,
         temperature=temperature,
         google_api_key=settings.GOOGLE_API_KEY,
         callbacks=callbacks if callbacks else None

@@ -1,0 +1,218 @@
+{
+	"info": {
+		"_postman_id": "c4f21d87-6e0b-4a8f-a6b9-1e3a8f2fb9c6",
+		"name": "HSK Chatbot API",
+		"description": "Collection for testing the HSK Chatbot API endpoints",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Root Endpoint",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						""
+					]
+				},
+				"description": "Root endpoint that returns a welcome message"
+			},
+			"response": []
+		},
+		{
+			"name": "Health Check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{base_url}}/api/health",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"health"
+					]
+				},
+				"description": "Health check endpoint to verify the API is running properly"
+			},
+			"response": []
+		},
+		{
+			"name": "Chat with Gemini (Graph)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_input\": \"Xin chào, tôi muốn học tiếng Trung\",\n    \"model_provider\": \"gemini\",\n    \"use_graph\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/chat",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chat"
+					]
+				},
+				"description": "Chat with the HSK Chatbot using Gemini model and graph-based approach"
+			},
+			"response": []
+		},
+		{
+			"name": "Chat with Gemini (Simple Chain)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_input\": \"你好，我想学习汉语\",\n    \"model_provider\": \"gemini\",\n    \"use_graph\": false\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/chat",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chat"
+					]
+				},
+				"description": "Chat with the HSK Chatbot using Gemini model and simple chain approach"
+			},
+			"response": []
+		},
+		{
+			"name": "Chat with OpenAI (Graph)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_input\": \"HSK 1 là gì?\",\n    \"model_provider\": \"openai\",\n    \"use_graph\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/chat",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chat"
+					]
+				},
+				"description": "Chat with the HSK Chatbot using OpenAI model and graph-based approach"
+			},
+			"response": []
+		},
+		{
+			"name": "Chat with OpenAI (Simple Chain)",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_input\": \"What is HSK?\",\n    \"model_provider\": \"openai\",\n    \"use_graph\": false\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/chat",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chat"
+					]
+				},
+				"description": "Chat with the HSK Chatbot using OpenAI model and simple chain approach"
+			},
+			"response": []
+		},
+		{
+			"name": "Chat with Session ID",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"user_input\": \"Tiếp tục câu chuyện của chúng ta\",\n    \"session_id\": \"{{session_id}}\",\n    \"model_provider\": \"gemini\",\n    \"use_graph\": true\n}"
+				},
+				"url": {
+					"raw": "{{base_url}}/api/chat",
+					"host": [
+						"{{base_url}}"
+					],
+					"path": [
+						"api",
+						"chat"
+					]
+				},
+				"description": "Continue a chat session using a previously returned session_id"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					"// Save session_id from chat response",
+					"if (pm.response.code === 200 && pm.response.json().session_id) {",
+					"    pm.environment.set(\"session_id\", pm.response.json().session_id);",
+					"}"
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8000",
+			"type": "string"
+		}
+	]
+} 

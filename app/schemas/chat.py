@@ -21,7 +21,20 @@ class ChatRequest(BaseModel):
             "properties": {
                 "model_provider": {
                     "type": "string",
-                    "enum": [provider.value for provider in ModelProvider]
+                    "enum": [provider.value for provider in ModelProvider],
+                    "default": ModelProvider.GEMINI.value
+                },
+                "use_graph": {
+                    "type": "boolean",
+                    "default": True
+                },
+                "session_id": {
+                    "type": "string",
+                    "default": None
+                },
+                "user_input": {
+                    "type": "string",
+                    "default": None
                 }
             }
         }

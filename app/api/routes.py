@@ -62,13 +62,14 @@ async def chat(request: ChatRequest = Body(...)):
     """
     try:
         # Validate the model provider
+        
         validated_provider = validate_model_provider(request.model_provider)
         
         if request.use_graph:
             response, session_id = chat_with_graph(
                 request.user_input, 
                 request.session_id, 
-                model_provider=validated_provider
+                model_provider=validated_provider,
             )
         else:
             response, session_id = chat_with_simple_chain(

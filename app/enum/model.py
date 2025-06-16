@@ -13,3 +13,5 @@ class ModelGeminiName(Enum):
 class ModelOpenAiName(Enum):
     OPENAI_GPT_4O_MINI = "gpt-4o-mini"
     OPENAI_GPT_4O_MINI_2024_07_18 = "gpt-4o-mini-2024-07-18"
+    OPENAI_GPT_4_1_NANO = "gpt-4.1-nano"
+    

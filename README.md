@@ -8,6 +8,7 @@ A Vietnamese language chatbot application built with LangChain, LangGraph, and F
 - Supports both simple chain-based and graph-based conversation patterns
 - Can switch between OpenAI and Google Gemini models
 - Persists chat history in MongoDB
+- Semantic retrieval using Qdrant vector database for relevant context
 - Optional LangSmith tracing for debugging and analytics
 
 ## Architecture
@@ -71,6 +72,11 @@ Create a `.env` file with the following variables:
 # Database settings
 MONGODB_URI=mongodb://localhost:27017
 MONGODB_DB_NAME=hsk_chatbot
+
+# Qdrant settings
+QDRANT_URL=http://localhost:6333
+QDRANT_API_KEY=
+QDRANT_COLLECTION_NAME=hsk-chatbot
 
 # LLM API settings
 OPENAI_API_KEY=your_openai_api_key
@@ -160,4 +166,26 @@ docker-compose up
 
 ## License
 
-[MIT License](LICENSE) 
+[MIT License](LICENSE)
+
+## Setting up Qdrant
+
+This application uses Qdrant as a vector database for semantic search of chat history.
+
+1. You can use the built-in Qdrant service in docker-compose
+2. Or install Qdrant locally following instructions at [Qdrant](https://qdrant.tech/documentation/quick-start/)
+3. If you're using a hosted Qdrant service, add your API key to the `.env` file as `QDRANT_API_KEY`
+
+The application will automatically create the necessary collections on first run. By default, it connects to the local Qdrant instance at http://localhost:6333.
+
+## How Semantic Retrieval Works
+
+Instead of just retrieving the most recent messages, this chatbot:
+
+1. Embeds the user's query using the sentence-transformers model
+2. Searches the vector store for semantically similar previous messages
+3. Retrieves the most relevant context based on the current question
+4. Combines recent messages with semantically relevant ones
+5. Passes this optimized context to the LLM for a more informed response
+
+This allows the chatbot to provide more consistent and relevant responses by maintaining context across the conversation, even when discussing topics from earlier in the chat history. 
